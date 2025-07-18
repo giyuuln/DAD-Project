@@ -35,16 +35,24 @@ switch($method) {
 // FUNCTIONS
 
 function getAllDoctors($pdo) {
-    $stmt = $pdo->query("SELECT * FROM doctors ORDER BY last_name, first_name");
-    $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($doctors);
+    $stmt = $pdo->query("
+      SELECT doctor_id, first_name, last_name,
+             specialization, phone, email
+        FROM doctors
+    ORDER BY last_name, first_name
+    ");
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 }
 
 function getDoctor($pdo, $id) {
-    $stmt = $pdo->prepare("SELECT * FROM doctors WHERE doctor_id = ?");
+    $stmt = $pdo->prepare("
+      SELECT doctor_id, first_name, last_name,
+             specialization, phone, email
+        FROM doctors
+       WHERE doctor_id = ?
+    ");
     $stmt->execute([$id]);
-    $doctor = $stmt->fetch(PDO::FETCH_ASSOC);
-    echo json_encode($doctor ? $doctor : ["error" => "Doctor not found"]);
+    echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
 }
 
 function createDoctor($pdo) {
