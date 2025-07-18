@@ -1,13 +1,13 @@
 package gui;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import models.Appointment;
 import services.RestClient;
 
+@SuppressWarnings("serial")
 public class AppointmentPanel extends JPanel {
 
     private RestClient restClient;
@@ -26,7 +26,6 @@ public class AppointmentPanel extends JPanel {
         loadAppointments();
     }
 
-    @SuppressWarnings("serial")
     private void initialize() {
         setLayout(null);
         scrollPane = new JScrollPane();
