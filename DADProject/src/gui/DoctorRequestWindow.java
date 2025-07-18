@@ -1,10 +1,9 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -27,15 +26,11 @@ public class DoctorRequestWindow extends JFrame {
     private int doctorId;
     private DefaultTableModel tableModel;
     private List<Appointment> appointments;
-
+    private static volatile boolean notificationServerStarted = false;
+    
+    
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                new DoctorRequestWindow(2);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+    	
     }
 
     public DoctorRequestWindow(int doctorId) {
@@ -70,12 +65,12 @@ public class DoctorRequestWindow extends JFrame {
         getContentPane().add(refreshButton);
 
         JButton approveButton = new JButton("Approve & Schedule");
-        approveButton.setBounds(161, 222, 130, 21);
+        approveButton.setBounds(161, 222, 173, 21);
         approveButton.addActionListener(e -> approveAndScheduleSelected());
         getContentPane().add(approveButton);
 
         JButton rejectButton = new JButton("Reject");
-        rejectButton.setBounds(310, 222, 85, 21);
+        rejectButton.setBounds(371, 222, 85, 21);
         rejectButton.addActionListener(e -> rejectSelected());
         getContentPane().add(rejectButton);
 
@@ -94,7 +89,11 @@ public class DoctorRequestWindow extends JFrame {
      * Spin up a background thread that listens for "NEW_APPOINTMENT"
      * pings on port (6000 + doctorId) and reloads the table.
      */
-    private void startNotificationServer() {
+    private synchronized void startNotificationServer() {
+    	// if we've already started it, just return
+        if (notificationServerStarted) return;
+        notificationServerStarted = true;
+    	
         final int port = 6000 + doctorId;
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(port)) {
@@ -113,7 +112,12 @@ public class DoctorRequestWindow extends JFrame {
                         inner.printStackTrace();
                     }
                 }
-            } catch (Exception e) {
+            }
+            catch (BindException be) {
+                // PORT ALREADY IN USE — skip starting notifications
+                System.err.println("Notification server already running on port " 
+                                   + port + ", skipping.");  // no dialog
+            }catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this,
                     "Failed to start notification server on port " + port +
