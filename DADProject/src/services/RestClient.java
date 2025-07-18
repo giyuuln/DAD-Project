@@ -388,6 +388,59 @@ public class RestClient {
         }
         return false;
     }
+    
+    /**
+     * Call your PHP login endpoint.
+     */
+    public JSONObject  authenticateDoctor(String email, String password) {
+    	try {
+            JSONObject req = new JSONObject()
+                .put("email",    email)
+                .put("password", password);
+            String raw = makeHTTPRequest(
+                BASE_URL + "/doctor_auth.php",
+                "POST",
+                req.toString()
+            );
+            return raw != null
+                 ? new JSONObject(raw)
+                 : null;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Call your PHP registration endpoint.
+     */
+    public boolean registerDoctor(String firstName,
+                                  String lastName,
+                                  String email,
+                                  String phone,
+                                  String specialization,
+                                  String password)
+    {
+    	try {
+            JSONObject req = new JSONObject()
+                .put("firstName",      firstName)
+                .put("lastName",       lastName)
+                .put("email",          email)
+                .put("phone",          phone)
+                .put("specialization", specialization)
+                .put("password",       password);
+            String raw = makeHTTPRequest(
+                BASE_URL + "/doctor_registration.php",
+                "POST",
+                req.toString()
+            );
+            JSONObject resp = new JSONObject(raw);
+            return resp.optBoolean("success", false);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 
     public void close() {
     	try {
