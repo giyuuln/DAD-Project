@@ -6,6 +6,7 @@ import models.Doctor;
 import models.Patient;
 import services.RestClient;
 
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -278,16 +279,16 @@ public class AppointmentFormWindow extends JFrame {
     }
 
     /** One-shot TCP ping to the doctor's listener. */
-    private void notifyDoctor(int doctorId) {
-        final int port = 6000 + doctorId;
-        new Thread(() -> {
-            try (Socket sock = new Socket("localhost", port);
-                 PrintWriter out = new PrintWriter(
-                     sock.getOutputStream(), true)) {
-                out.println("NEW_APPOINTMENT");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, "NotifyDoctor-" + doctorId).start();
+    private void notifyDoctor(int selectedDoctorId) {
+        final int port = 6000 + selectedDoctorId;
+        try (Socket sock = new Socket("localhost", port);
+        	     OutputStream out = sock.getOutputStream()) {
+        	    out.write("NEW_APPOINTMENT\n".getBytes());
+        	} catch (java.net.ConnectException ce) {
+        	    // doctor UI not running or not listening – skip notification silently
+        	    System.err.println("No notification server on port " + port + ", skipping");
+        	} catch (Exception ex) {
+        	    ex.printStackTrace();
+        	}
     }
 }
