@@ -24,6 +24,7 @@ public class DoctorRequestWindow extends JFrame {
     private JTable table;
     private RestClient restClient;
     private int doctorId;
+    private String doctorName;
     private DefaultTableModel tableModel;
     private List<Appointment> appointments;
     private static volatile boolean notificationServerStarted = false;
@@ -33,11 +34,12 @@ public class DoctorRequestWindow extends JFrame {
     	
     }
 
-    public DoctorRequestWindow(int doctorId) {
+    public DoctorRequestWindow(int doctorId , String doctorName) {
         this.doctorId   = doctorId;
+        this.doctorName = doctorName;
         this.restClient = new RestClient();
 
-        setTitle("Appointment Requests for Doctor " + doctorId);
+        setTitle("Appointment Requests for Doctor " + doctorName);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
