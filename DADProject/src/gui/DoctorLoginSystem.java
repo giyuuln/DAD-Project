@@ -184,10 +184,16 @@ public class DoctorLoginSystem {
                         JSONObject resp = get();
                         if (resp != null && resp.optBoolean("success", false)) {
                             int doctorId = resp.getInt("doctor_id");
+                            
+                            String firstName = resp.getString("first_name");
+                            String lastName = resp.getString("last_name");
+                            
+                            String doctorName = firstName + " " + lastName;
+                            
                             showMessage("Login successful!", Color.GREEN);
                             // give a little pause
                             Timer loginTimer = new Timer(300, ev -> {
-                            	        new DoctorRequestWindow(doctorId);
+                            	        new DoctorRequestWindow(doctorId, doctorName);
                             	        frame.dispose();
                             	   });
                             	    loginTimer.setRepeats(false);
