@@ -33,8 +33,9 @@ try {
         if (password_verify($password, $doc['password_hash'])) {
             echo json_encode([
                 "success"   => true,
-                "doctor_id" => $doc['doctor_id']
-
+                "doctor_id" => $doc['doctor_id'],
+                "first_name" => $doc['first_name'],
+                "last_name"  => $doc['last_name'],
             ]);
         } else {
             // Invalid password
